@@ -8,7 +8,34 @@ public class ProjectD : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+		PublicDependencyModuleNames.AddRange(new string[] {
+			"Core",
+			"CoreUObject",
+			"Engine",
+			"InputCore",
+            "EnhancedInput",
+            "AIModule",
+            "UMG",
+            "Slate",
+            "SlateCore",
+
+			// GAS
+			"GameplayAbilities",
+            "GameplayTags",
+            "GameplayTasks",
+
+			// NetWork
+            "Sockets",
+            "Networking",
+            "NetCore",
+
+			// Navigation
+			"NavigationSystem",
+
+			// State Tree
+			"StateTreeModule",
+            "GameplayStateTreeModule",
+        });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
