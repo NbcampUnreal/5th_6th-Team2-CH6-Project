@@ -35,6 +35,9 @@ public class ProjectD : ModuleRules
 			// State Tree
 			"StateTreeModule",
             "GameplayStateTreeModule",
+
+			// Mover
+			"Mover",
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
