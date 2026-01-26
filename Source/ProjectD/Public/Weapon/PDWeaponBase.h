@@ -4,6 +4,8 @@
 #include "GameFramework/Actor.h"
 #include "PDWeaponBase.generated.h"
 
+class UDataAsset_Weapon;
+
 UCLASS()
 class PROJECTD_API APDWeaponBase : public AActor
 {
@@ -12,4 +14,14 @@ class PROJECTD_API APDWeaponBase : public AActor
 public:	
 	APDWeaponBase();
 
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UDataAsset_Weapon> WeaponData;
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<USceneComponent> RootComp;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<USceneComponent> MuzzlePoint;
 };
