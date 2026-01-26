@@ -52,7 +52,6 @@ void UGA_Fire::ActivateAbility(
 
 	if (HasAuthority(&ActivationInfo))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UGA_Fire::ActivateAbility - Server Muzzle Trace"));
 		ASC->AbilityTargetDataSetDelegate(Handle, PredKey)
 			.AddUObject(this, &UGA_Fire::OnTargetDataReceived);
 
@@ -63,7 +62,6 @@ void UGA_Fire::ActivateAbility(
 	
 	if (ActorInfo->IsLocallyControlled())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UGA_Fire::ActivateAbility - Client Camera Trace"));
 		UWorld* World = GetWorld();
 		if (!World)
 		{

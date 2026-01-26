@@ -6,7 +6,7 @@
 #include "DataAsset_Weapon.generated.h"
 
 UENUM(BlueprintType)
-enum class EPTWeaponType : uint8
+enum class EPDWeaponType : uint8
 {
 	Pistol,
 	Rifle,
@@ -20,7 +20,7 @@ class PROJECTD_API UDataAsset_Weapon : public UPrimaryDataAsset
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	EPTWeaponType WeaponType;
+	EPDWeaponType WeaponType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (TitleProperty = "InputTag"))
 	TArray<FPDPlayerAbilitySet> GrantedAbilitySets;
