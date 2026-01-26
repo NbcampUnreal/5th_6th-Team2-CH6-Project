@@ -24,4 +24,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (TitleProperty = "InputTag"))
 	TArray<FPDPlayerAbilitySet> GrantedAbilitySets;
+	
+	float MaxRange = 10000.f;
 };

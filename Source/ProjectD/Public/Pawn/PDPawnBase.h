@@ -28,6 +28,9 @@ public:
 
 	USkeletalMeshComponent* GetSkeletalMeshComponent() const;
 	
+	UFUNCTION(Client, Unreliable)
+	void ClientDrawServerFireDebug(const FVector& Start, const FVector& End, bool bHit, const FVector& HitPoint);
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnRep_PlayerState() override;
