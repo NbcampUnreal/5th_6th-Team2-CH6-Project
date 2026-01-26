@@ -5,9 +5,11 @@
 #include "Components/Input/PDEnhancedInputComponent.h"
 #include "Components/Combat/WeaponManageComponent.h"
 #include "Components/Combat/SkillManageComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "DataAssets/Input/DataAsset_InputConfig.h"
 #include "GameplayTagContainer.h"
 #include "PDGameplayTags.h"
+#include "DataAssets/StartUp/DataAsset_StartUpBase.h"
 
 APDPawnBase::APDPawnBase()
 {
@@ -30,6 +32,11 @@ UAbilitySystemComponent* APDPawnBase::GetAbilitySystemComponent() const
 	return nullptr;
 }
 
+USkeletalMeshComponent* APDPawnBase::GetSkeletalMeshComponent() const
+{
+	return FindComponentByClass<USkeletalMeshComponent>();
+}
+
 void APDPawnBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -41,6 +48,14 @@ void APDPawnBase::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 
 	InitAbilityActorInfo();
+	
+	if (!CharacterStartUpData.IsNull())
+	{
+		if (UDataAsset_StartUpBase* LoadedData = CharacterStartUpData.LoadSynchronous())
+		{
+			LoadedData->GiveToAbilitySystemComponent(Cast<UPDAbilitySystemComponent>(GetAbilitySystemComponent()));
+		}
+	}
 }
 
 void APDPawnBase::OnRep_PlayerState()

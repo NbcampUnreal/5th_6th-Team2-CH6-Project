@@ -10,6 +10,7 @@ class UWeaponManageComponent;
 class USkillManageComponent;
 class UDataAsset_InputConfig;
 class UDataAsset_StartUpBase;
+class USkeletalMeshComponent;
 struct FInputActionValue;
 
 UCLASS()
@@ -25,6 +26,8 @@ public:
 	FORCEINLINE UWeaponManageComponent* GetWeaponManageComponent() const { return WeaponManageComponent; }
 	FORCEINLINE USkillManageComponent* GetSkillManageComponent() const { return SkillManageComponent; }
 
+	USkeletalMeshComponent* GetSkeletalMeshComponent() const;
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnRep_PlayerState() override;
