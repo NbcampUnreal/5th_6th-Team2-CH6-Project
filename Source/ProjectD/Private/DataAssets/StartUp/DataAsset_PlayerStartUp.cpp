@@ -17,7 +17,7 @@ void UDataAsset_PlayerStartUp::GiveToAbilitySystemComponent(UPDAbilitySystemComp
 		FGameplayAbilitySpec AbilitySpec(PlayerAbility.AbilityToGrant);
 		AbilitySpec.SourceObject = InASC->GetAvatarActor();
 		AbilitySpec.Level = ApplyLevel;
-		AbilitySpec.DynamicAbilityTags.AddTag(PlayerAbility.InputTag);
+		AbilitySpec.GetDynamicSpecSourceTags().AddTag(PlayerAbility.InputTag);
 
 		InASC->GiveAbility(AbilitySpec);
 	}

@@ -1,9 +1,8 @@
 #include "Components/Combat/WeaponManageComponent.h"
 #include "DataAssets/Weapon/DataAsset_Weapon.h"
 #include "Weapon/PDWeaponBase.h"
-#include "GameFramework/Character.h"
 #include "Pawn/PDPawnBase.h"
-#include "AbilitySystem/PDAbilitySystemComponent.h"
+#include "AbilitySystemComponent.h"
 #include "AbilitySystem/Abilities/PDGameplayAbility.h"
 #include "Structs/PDPlayerAbilitySet.h"
 #include "Net/UnrealNetwork.h"
@@ -13,10 +12,10 @@ UWeaponManageComponent::UWeaponManageComponent()
     PrimaryComponentTick.bCanEverTick = false;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
 
+    SetIsReplicatedByDefault(true);
+    
     Slots.SetNum(2);
     BackSocketNames.SetNum(2);
-
-    SetIsReplicatedByDefault(true);
 }
 
 void UWeaponManageComponent::BeginPlay()
@@ -195,11 +194,11 @@ void UWeaponManageComponent::AttachToBack(APDWeaponBase* Weapon, int32 SlotIndex
     );
 }
 
-UPDAbilitySystemComponent* UWeaponManageComponent::GetPDASC() const
+UAbilitySystemComponent* UWeaponManageComponent::GetASC() const
 {
-    if (const APDPawnBase* OwnerChar = Cast<APDPawnBase>(GetOwner()))
+    if (const APDPawnBase* OwnerPawn = Cast<APDPawnBase>(GetOwner()))
     {
-        return Cast<UPDAbilitySystemComponent>(OwnerChar->GetAbilitySystemComponent());
+        return OwnerPawn->GetAbilitySystemComponent();
     }
 
     return nullptr;
@@ -207,7 +206,7 @@ UPDAbilitySystemComponent* UWeaponManageComponent::GetPDASC() const
 
 void UWeaponManageComponent::GrantAbilitiesFromWeaponData(UDataAsset_Weapon* WeaponData)
 {
-    UPDAbilitySystemComponent* ASC = GetPDASC();
+    UAbilitySystemComponent* ASC = GetASC();
     if (!ASC || !WeaponData)
     {
         return;
@@ -223,7 +222,7 @@ void UWeaponManageComponent::GrantAbilitiesFromWeaponData(UDataAsset_Weapon* Wea
         FGameplayAbilitySpec Spec(Entry.AbilityToGrant);
         Spec.SourceObject = GetOwner();
         Spec.Level = 1;
-        Spec.DynamicAbilityTags.AddTag(Entry.InputTag);
+        Spec.GetDynamicSpecSourceTags().AddTag(Entry.InputTag);
 
         const FGameplayAbilitySpecHandle Handle = ASC->GiveAbility(Spec);
         CurrentWeaponGrantedAbilityHandles.Add(Handle);
@@ -232,7 +231,7 @@ void UWeaponManageComponent::GrantAbilitiesFromWeaponData(UDataAsset_Weapon* Wea
 
 void UWeaponManageComponent::RemoveCurrentWeaponGrantedAbilities()
 {
-    UPDAbilitySystemComponent* ASC = GetPDASC();
+    UAbilitySystemComponent* ASC = GetASC();
     if (!ASC)
     {
         CurrentWeaponGrantedAbilityHandles.Reset();

@@ -9,7 +9,7 @@ void UPDAbilitySystemComponent::OnAbilityInputPressed(const FGameplayTag& InInpu
 
 	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
-		if (!AbilitySpec.DynamicAbilityTags.HasTagExact(InInputTag))
+		if (!AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InInputTag))
 		{
 			continue;
 		}

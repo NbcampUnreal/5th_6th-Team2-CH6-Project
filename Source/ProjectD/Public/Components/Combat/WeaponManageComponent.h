@@ -52,7 +52,7 @@ private:
     void AttachToHand(APDWeaponBase* Weapon);
     void AttachToBack(APDWeaponBase* Weapon, int32 SlotIndex);
 
-    UPDAbilitySystemComponent* GetPDASC() const;
+    UAbilitySystemComponent* GetASC() const;
     void GrantAbilitiesFromWeaponData(UDataAsset_Weapon* WeaponData);
     void RemoveCurrentWeaponGrantedAbilities();
 
