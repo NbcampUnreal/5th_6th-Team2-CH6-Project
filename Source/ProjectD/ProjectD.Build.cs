@@ -42,8 +42,6 @@ public class ProjectD : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
-		PrivateIncludePaths.AddRange(new string[] { "ProjecctD" });
-
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 		
