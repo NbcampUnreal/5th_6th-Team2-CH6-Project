@@ -38,6 +38,17 @@ public class ProjectD : ModuleRules
 
 			// Mover
 			"Mover",
+
+			// Mass AI
+            "MassEntity",
+            "MassCommon",
+            "MassMovement",
+            "MassSpawner",
+            "MassRepresentation",
+            "MassSignals",
+            "StructUtils",
+            "MassNavigation",
+            "MassAIBehavior",
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
