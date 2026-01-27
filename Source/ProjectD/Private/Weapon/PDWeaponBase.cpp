@@ -8,6 +8,11 @@ APDWeaponBase::APDWeaponBase()
 	RootComp = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
 	SetRootComponent(RootComp);
 	
-	MuzzlePoint = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzlePoint"));
-	MuzzlePoint->SetupAttachment(RootComp);
+	Muzzle = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzlePoint"));
+	Muzzle->SetupAttachment(RootComp);
+}
+
+FVector APDWeaponBase::GetMuzzlePoint() const
+{
+	return Muzzle ? Muzzle->GetComponentLocation() : FVector::ZeroVector;
 }

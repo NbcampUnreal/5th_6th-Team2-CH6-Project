@@ -37,10 +37,32 @@ USkeletalMeshComponent* APDPawnBase::GetSkeletalMeshComponent() const
 	return FindComponentByClass<USkeletalMeshComponent>();
 }
 
+void APDPawnBase::ClientDrawFireDebug_Implementation(
+	const FVector& Start,
+	const FVector& End,
+	bool bHit,
+	const FVector& HitPoint
+)
+{
+	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1.f, 0, 1.f);
+	if (bHit)
+	{
+		DrawDebugPoint(GetWorld(), HitPoint, 8.f, FColor::Yellow, false, 1.f);
+	}
+}
+
 void APDPawnBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	UWorld* World = GetWorld();
+	UE_LOG(LogTemp, Warning, TEXT("[Pawn BeginPlay] NetMode=%d HasAuthority=%d LocalRole=%d IsReplicated=%d Name=%s"),
+		World ? (int32)World->GetNetMode() : -1,
+		HasAuthority() ? 1 : 0,
+		(int32)GetLocalRole(),
+		GetIsReplicated() ? 1 : 0,
+		*GetName());
+
 }
 
 void APDPawnBase::PossessedBy(AController* NewController)

@@ -1,10 +1,6 @@
 #include "AbilitySystem/Abilities/Player/GA_Equip.h"
 #include "Components/Combat/WeaponManageComponent.h"
 
-UGA_Equip::UGA_Equip()
-{
-}
-
 void UGA_Equip::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,

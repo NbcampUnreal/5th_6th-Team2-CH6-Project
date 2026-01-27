@@ -10,8 +10,6 @@ class PROJECTD_API UGA_Equip : public UPDPlayerGameplayAbility
 	GENERATED_BODY()
 	
 public:
-	UGA_Equip();
-
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
