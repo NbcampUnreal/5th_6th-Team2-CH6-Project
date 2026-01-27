@@ -142,7 +142,7 @@ void UGA_Fire::OnTargetDataReceived(const FGameplayAbilityTargetDataHandle& Data
     }
 
     ASC->ConsumeClientReplicatedTargetData(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey());
-
+ 
     const FGameplayAbilityTargetData* Raw = Data.Get(0);
     const FGameplayAbilityTargetData_LocationInfo* LocInfo = static_cast<const FGameplayAbilityTargetData_LocationInfo*>(Raw);
     if (!LocInfo)
@@ -150,11 +150,11 @@ void UGA_Fire::OnTargetDataReceived(const FGameplayAbilityTargetDataHandle& Data
         EndAbility(CurrentSpecHandle, ActorInfo, CurrentActivationInfo, true, true);
         return;
     }
-
+ 
     const FVector AimPoint = LocInfo->TargetLocation.GetTargetingTransform().GetLocation();
-
+ 
 	MuzzleTraceAndApplyGE(OwnerPawn, Weapon, AimPoint);
-
+	
     EndAbility(CurrentSpecHandle, ActorInfo, CurrentActivationInfo, true, false);
 }
 
@@ -184,7 +184,9 @@ void UGA_Fire::MuzzleTraceAndApplyGE(APDPawnBase* OwnerPawn, APDWeaponBase* Weap
 		Params
 	);
 
-	OwnerPawn->ClientDrawServerFireDebug(MuzzleStart, bHit? Hit.ImpactPoint : MuzzleEnd, bHit, Hit.ImpactPoint);
+	OwnerPawn->ClientDrawFireDebug(MuzzleStart, bHit? Hit.ImpactPoint : MuzzleEnd, bHit, Hit.ImpactPoint);
+	
+	// TODO: Apply Gameplay Effect to Hit Target
 }
 
 FGameplayAbilityTargetDataHandle UGA_Fire::MakeAimPointTargetData(const FVector& CameraStart, const FVector& AimPoint)

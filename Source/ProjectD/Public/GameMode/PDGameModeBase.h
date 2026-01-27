@@ -9,4 +9,8 @@ class PROJECTD_API APDGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+public:
+	APDGameModeBase();
+	
+	virtual void BeginPlay() override;
 };
