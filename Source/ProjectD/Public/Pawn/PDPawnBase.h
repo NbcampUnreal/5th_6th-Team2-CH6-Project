@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
@@ -11,6 +11,10 @@ class USkillManageComponent;
 class UDataAsset_InputConfig;
 class UDataAsset_StartUpBase;
 class USkeletalMeshComponent;
+class ABallCore;
+class AGoalPost;
+class UGameplayEffect;
+class UCapsuleComponent;
 struct FInputActionValue;
 
 UCLASS()
@@ -52,4 +56,54 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CharacterData")
 	TSoftObjectPtr<UDataAsset_StartUpBase> CharacterStartUpData;
+
+
+// =============
+public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out) const override;
+
+	// 입력(F)
+	UFUNCTION(BlueprintCallable)
+	void TryInteract();
+
+	// Ball에서 호출
+	UFUNCTION(Server, Reliable)
+	void Server_OnBallPicked(ABallCore* Ball);
+
+	UFUNCTION(Server, Reliable)
+	void Server_OnBallRemoved();
+
+	UFUNCTION(Server, Reliable)
+	void Server_PickUpBall(ABallCore* Ball);
+
+	UFUNCTION(Server, Reliable)
+	void Server_DropBall();
+
+	ABallCore* GetCarriedBall() const { return CarriedBall; }
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+	FName BallSocketName = FName("BallSocket");
+
+protected:
+	// ===== 상태 =====
+	UPROPERTY(Replicated)
+	TObjectPtr<ABallCore> CarriedBall = nullptr; //
+
+	
+
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGameplayEffect> GE_HoldingBall; // 
+
+	void ApplyHoldingBallEffect(); //
+	void RemoveHoldingBallEffect(); // 
+
+	// ===== 서버 =====
+	UFUNCTION(Server, Reliable)
+	void Server_TryInteract(AActor* Target);
+
+	
+
+	// ===== 유틸 =====
+	AActor* FindInteractTarget() const;
 };
