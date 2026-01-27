@@ -10,6 +10,9 @@ APDTeleporter::APDTeleporter()
 	CapsuleComp->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	CapsuleComp->SetupAttachment(RootComponent);
 
+	Destination = CreateDefaultSubobject<USceneComponent>(TEXT("Destination"));
+	Destination->SetupAttachment(RootComponent);
+
 	Shape = CapsuleComp;
 }
 
