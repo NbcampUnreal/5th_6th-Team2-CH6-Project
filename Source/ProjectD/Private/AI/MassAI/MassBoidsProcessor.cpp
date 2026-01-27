@@ -94,8 +94,10 @@ FVector UMassBoidsProcessor::ComputeSeparation(const FVector& MyPos, const FVect
 
 	for (int32 j = 0; j < NumEntities; ++j)
 	{
-		if (MyIndex == j) 
+		if (MyIndex == j)
+		{
 			continue;
+		}
 
 		FVector OtherPos = Transforms[j].GetTransform().GetLocation();
 		float DistSq = FVector::DistSquared(MyPos, OtherPos);
@@ -125,8 +127,10 @@ FVector UMassBoidsProcessor::ComputeAlignment(const FVector& MyPos, const FVecto
 
 	for (int32 j = 0; j < NumEntities; ++j)
 	{
-		if (MyIndex == j) continue;
-
+		if (MyIndex == j)
+		{
+			continue;
+		}
 		FVector OtherPos = Transforms[j].GetTransform().GetLocation();
 		float DistSq = FVector::DistSquared(MyPos, OtherPos);
 
@@ -154,7 +158,10 @@ FVector UMassBoidsProcessor::ComputeCohesion(const FVector& MyPos, const FVector
 
 	for (int32 j = 0; j < NumEntities; ++j)
 	{
-		if (MyIndex == j) continue;
+		if (MyIndex == j)
+		{
+			continue;
+		}
 
 		FVector OtherPos = Transforms[j].GetTransform().GetLocation();
 		float DistSq = FVector::DistSquared(MyPos, OtherPos);
@@ -197,14 +204,18 @@ FVector UMassBoidsProcessor::ComputeBounds(const FVector& MyPos, const FVector& 
 
 FVector UMassBoidsProcessor::ComputeObstacleAvoidance(const FVector& MyPos, const FVector& MyVel, const FMassBoidsFragment& Settings, const UWorld* World) const
 {
-	if (!World) return FVector::ZeroVector;
+	if (IsValid(World) == false)
+	{
+		return FVector::ZeroVector;
+	}
 
 	FVector Forward = MyVel.GetSafeNormal();
-	if (Forward.IsNearlyZero()) 
+	if (Forward.IsNearlyZero())
+	{
 		Forward = FVector::ForwardVector;
+	}
 
 	FQuat VelocityQuat = Forward.ToOrientationQuat();
-
 	float CheckDistance = Settings.ObstacleCheckDistance;
 
 	FVector TotalAvoidForce = FVector::ZeroVector;
