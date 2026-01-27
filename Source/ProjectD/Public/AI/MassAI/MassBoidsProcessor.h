@@ -14,11 +14,11 @@ struct FMassVelocityFragment;
  * 
  */
 UCLASS()
-class PROJECTD_API UMassBoidsProcesser : public UMassProcessor
+class PROJECTD_API UMassBoidsProcessor : public UMassProcessor
 {
 	GENERATED_BODY()
 public:
-    UMassBoidsProcesser();
+    UMassBoidsProcessor();
 
 protected:
     virtual void ConfigureQueries(const TSharedRef<FMassEntityManager>& EntityManager) override;

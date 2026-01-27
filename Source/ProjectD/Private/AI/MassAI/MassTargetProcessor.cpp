@@ -4,6 +4,7 @@
 #include "AI/MassAI/MassTargetProcessor.h"
 #include "AI/MassAI/MassTargetFragment.h"
 #include "MassExecutionContext.h"
+#include "AI/MassAI/MassBoidsProcessor.h"
 
 // [Test] - To Chase Player
 #include "Kismet/GameplayStatics.h"
@@ -13,7 +14,7 @@ UMassTargetProcessor::UMassTargetProcessor()
 	:EntityQuery(*this)
 {
 	ProcessingPhase = EMassProcessingPhase::PrePhysics;
-    ExecutionOrder.ExecuteBefore.Add(TEXT("MassBoidsProcesser"));
+    ExecutionOrder.ExecuteBefore.Add(UMassBoidsProcessor::StaticClass()->GetFName());
 }
 
 void UMassTargetProcessor::ConfigureQueries(const TSharedRef<FMassEntityManager>& EntityManager)

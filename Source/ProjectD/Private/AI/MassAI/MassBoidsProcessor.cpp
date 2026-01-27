@@ -8,13 +8,13 @@
 #include "AI/MassAI/MassBoidsFragment.h"
 #include "AI/MassAI/MassTargetFragment.h"
 
-UMassBoidsProcesser::UMassBoidsProcesser()
+UMassBoidsProcessor::UMassBoidsProcessor()
 	:EntityQuery(*this)
 {
 	ProcessingPhase = EMassProcessingPhase::PrePhysics;
 }
 
-void UMassBoidsProcesser::ConfigureQueries(const TSharedRef<FMassEntityManager>& EntityManager)
+void UMassBoidsProcessor::ConfigureQueries(const TSharedRef<FMassEntityManager>& EntityManager)
 {
 	EntityQuery.AddRequirement<FTransformFragment>(EMassFragmentAccess::ReadWrite);
 	EntityQuery.AddRequirement<FMassVelocityFragment>(EMassFragmentAccess::ReadWrite);
@@ -24,7 +24,7 @@ void UMassBoidsProcesser::ConfigureQueries(const TSharedRef<FMassEntityManager>&
 	EntityQuery.RegisterWithProcessor(*this);
 }
 
-void UMassBoidsProcesser::Execute(FMassEntityManager& EntityManager, FMassExecutionContext& Context)
+void UMassBoidsProcessor::Execute(FMassEntityManager& EntityManager, FMassExecutionContext& Context)
 {
 	EntityQuery.ForEachEntityChunk(Context, [this](FMassExecutionContext& Context)
 		{
@@ -85,7 +85,7 @@ void UMassBoidsProcesser::Execute(FMassEntityManager& EntityManager, FMassExecut
 		});
 }
 
-FVector UMassBoidsProcesser::ComputeSeparation(const FVector& MyPos, const FVector& MyVel, int32 MyIndex, TArrayView<FTransformFragment> Transforms, TArrayView<FMassVelocityFragment> Velocities, const FMassBoidsFragment& Settings, int32 NumEntities) const
+FVector UMassBoidsProcessor::ComputeSeparation(const FVector& MyPos, const FVector& MyVel, int32 MyIndex, TArrayView<FTransformFragment> Transforms, TArrayView<FMassVelocityFragment> Velocities, const FMassBoidsFragment& Settings, int32 NumEntities) const
 {
 	FVector Steering = FVector::ZeroVector;
 	int32 Count = 0;
@@ -118,7 +118,7 @@ FVector UMassBoidsProcesser::ComputeSeparation(const FVector& MyPos, const FVect
 	return Steering;
 }
 
-FVector UMassBoidsProcesser::ComputeAlignment(const FVector& MyPos, const FVector& MyVel, int32 MyIndex, TArrayView<FTransformFragment> Transforms, TArrayView<FMassVelocityFragment> Velocities, const FMassBoidsFragment& Settings, int32 NumEntities) const
+FVector UMassBoidsProcessor::ComputeAlignment(const FVector& MyPos, const FVector& MyVel, int32 MyIndex, TArrayView<FTransformFragment> Transforms, TArrayView<FMassVelocityFragment> Velocities, const FMassBoidsFragment& Settings, int32 NumEntities) const
 {
 	FVector AvgVel = FVector::ZeroVector;
 	int32 Count = 0;
@@ -147,7 +147,7 @@ FVector UMassBoidsProcesser::ComputeAlignment(const FVector& MyPos, const FVecto
 	return FVector::ZeroVector;
 }
 
-FVector UMassBoidsProcesser::ComputeCohesion(const FVector& MyPos, const FVector& MyVel, int32 MyIndex, TArrayView<FTransformFragment> Transforms, TArrayView<FMassVelocityFragment> Velocities, const FMassBoidsFragment& Settings, int32 NumEntities) const
+FVector UMassBoidsProcessor::ComputeCohesion(const FVector& MyPos, const FVector& MyVel, int32 MyIndex, TArrayView<FTransformFragment> Transforms, TArrayView<FMassVelocityFragment> Velocities, const FMassBoidsFragment& Settings, int32 NumEntities) const
 {
 	FVector CenterOfMass = FVector::ZeroVector;
 	int32 Count = 0;
@@ -176,7 +176,7 @@ FVector UMassBoidsProcesser::ComputeCohesion(const FVector& MyPos, const FVector
 	return FVector::ZeroVector;
 }
 
-FVector UMassBoidsProcesser::ComputeBounds(const FVector& MyPos, const FVector& MyVel, const FVector& CenterPos, float Radius, const FMassBoidsFragment& Settings) const
+FVector UMassBoidsProcessor::ComputeBounds(const FVector& MyPos, const FVector& MyVel, const FVector& CenterPos, float Radius, const FMassBoidsFragment& Settings) const
 {
 	FVector Offset = CenterPos - MyPos;
 	float DistSq = Offset.SizeSquared();
@@ -195,7 +195,7 @@ FVector UMassBoidsProcesser::ComputeBounds(const FVector& MyPos, const FVector& 
 	return FVector::ZeroVector;
 }
 
-FVector UMassBoidsProcesser::ComputeObstacleAvoidance(const FVector& MyPos, const FVector& MyVel, const FMassBoidsFragment& Settings, const UWorld* World) const
+FVector UMassBoidsProcessor::ComputeObstacleAvoidance(const FVector& MyPos, const FVector& MyVel, const FMassBoidsFragment& Settings, const UWorld* World) const
 {
 	if (!World) return FVector::ZeroVector;
 
@@ -278,7 +278,7 @@ FVector UMassBoidsProcesser::ComputeObstacleAvoidance(const FVector& MyPos, cons
 	return FVector::ZeroVector;
 }
 
-FVector UMassBoidsProcesser::SteerTowards(const FVector& DesiredDirection, const FVector& CurrentVel, const FMassBoidsFragment& Settings) const
+FVector UMassBoidsProcessor::SteerTowards(const FVector& DesiredDirection, const FVector& CurrentVel, const FMassBoidsFragment& Settings) const
 {
 	FVector DesiredVelocity = DesiredDirection.GetSafeNormal() * Settings.MaxMoveSpeed;
 	FVector Steer = DesiredVelocity - CurrentVel;
