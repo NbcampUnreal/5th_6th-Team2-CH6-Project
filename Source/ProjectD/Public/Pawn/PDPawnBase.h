@@ -87,23 +87,15 @@ public:
 protected:
 	// ===== 상태 =====
 	UPROPERTY(Replicated)
-	TObjectPtr<ABallCore> CarriedBall = nullptr; //
-
-	
-
+	TObjectPtr<ABallCore> CarriedBall = nullptr; 
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UGameplayEffect> GE_HoldingBall; // 
+	TSubclassOf<UGameplayEffect> GE_HoldingBall;
+	void ApplyHoldingBallEffect(); 
+	void RemoveHoldingBallEffect(); 
 
-	void ApplyHoldingBallEffect(); //
-	void RemoveHoldingBallEffect(); // 
-
-	// ===== 서버 =====
 	UFUNCTION(Server, Reliable)
 	void Server_TryInteract(AActor* Target);
 
-	
-
-	// ===== 유틸 =====
 	AActor* FindInteractTarget() const;
 };

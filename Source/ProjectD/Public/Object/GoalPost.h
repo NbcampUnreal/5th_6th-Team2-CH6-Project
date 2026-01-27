@@ -25,6 +25,9 @@ public:
 	void Server_StealBall(APawn* Stealer);
 
 protected:
+	void StartHoldTimer();
+	void OnHoldComplete();
+
 	UPROPERTY()
 	TObjectPtr<ABallCore> PlacedBall = nullptr;
 
@@ -33,6 +36,4 @@ protected:
 
 	FTimerHandle HoldTimer;
 
-	void StartHoldTimer();
-	void OnHoldComplete();
 };
