@@ -49,6 +49,9 @@ public class ProjectD : ModuleRules
             "StructUtils",
             "MassNavigation",
             "MassAIBehavior",
+
+			//Niagara
+			"Niagara",
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
