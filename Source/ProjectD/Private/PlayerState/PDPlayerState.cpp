@@ -1,5 +1,6 @@
 #include "PlayerState/PDPlayerState.h"
 #include "AbilitySystem/PDAbilitySystemComponent.h"
+#include "AttributeSet/PDAttributeSetBase.h"
 
 APDPlayerState::APDPlayerState()
 {
@@ -9,6 +10,9 @@ APDPlayerState::APDPlayerState()
 	AbilitySystemComponent = CreateDefaultSubobject<UPDAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+	
+	AttributeSetBase = CreateDefaultSubobject<UPDAttributeSetBase>(TEXT("AttributeSetBase"));
+	
 }
 
 UAbilitySystemComponent* APDPlayerState::GetAbilitySystemComponent() const

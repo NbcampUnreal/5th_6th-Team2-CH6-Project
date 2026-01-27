@@ -1,5 +1,6 @@
 #include "Pawn/PDPawnBase.h"
 #include "PlayerState/PDPlayerState.h"
+#include "AbilitySystemComponent.h"
 #include "AbilitySystem/PDAbilitySystemComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Components/Input/PDEnhancedInputComponent.h"
@@ -10,6 +11,7 @@
 #include "GameplayTagContainer.h"
 #include "PDGameplayTags.h"
 #include "DataAssets/StartUp/DataAsset_StartUpBase.h"
+#include "AttributeSet/PDAttributeSetBase.h"
 
 APDPawnBase::APDPawnBase()
 {
@@ -54,15 +56,6 @@ void APDPawnBase::ClientDrawFireDebug_Implementation(
 void APDPawnBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	UWorld* World = GetWorld();
-	UE_LOG(LogTemp, Warning, TEXT("[Pawn BeginPlay] NetMode=%d HasAuthority=%d LocalRole=%d IsReplicated=%d Name=%s"),
-		World ? (int32)World->GetNetMode() : -1,
-		HasAuthority() ? 1 : 0,
-		(int32)GetLocalRole(),
-		GetIsReplicated() ? 1 : 0,
-		*GetName());
-
 }
 
 void APDPawnBase::PossessedBy(AController* NewController)
@@ -71,12 +64,17 @@ void APDPawnBase::PossessedBy(AController* NewController)
 
 	InitAbilityActorInfo();
 	
-	if (!CharacterStartUpData.IsNull())
+	if (HasAuthority())
 	{
-		if (UDataAsset_StartUpBase* LoadedData = CharacterStartUpData.LoadSynchronous())
+		if (!CharacterStartUpData.IsNull())
 		{
-			LoadedData->GiveToAbilitySystemComponent(Cast<UPDAbilitySystemComponent>(GetAbilitySystemComponent()));
+			if (UDataAsset_StartUpBase* LoadedData = CharacterStartUpData.LoadSynchronous())
+			{
+				LoadedData->GiveToAbilitySystemComponent(Cast<UPDAbilitySystemComponent>(GetAbilitySystemComponent()));
+			}
 		}
+		
+		InitAttributeSet();
 	}
 }
 
@@ -112,6 +110,49 @@ void APDPawnBase::InitAbilityActorInfo()
 	PDPlayerState->InitAbilityActorInfo(this);
 }
 
+void APDPawnBase::InitAttributeSet()
+{
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	if (!ASC)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APDPawnBase::InitAttributeSet - ASC is not valid"));
+		return;
+	}
+	
+	APDPlayerState* PDPlayerState = GetPlayerState<APDPlayerState>();
+	if (!PDPlayerState)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APDPawnBase::InitAttributeSet - PlayerState is not valid"));
+		return;
+	}
+	
+	ASC->AddAttributeSetSubobject<UPDAttributeSetBase>(PDPlayerState->GetPDAttributeSetBase());
+	
+	BindAttributeChangeDelegates();
+}
+
+void APDPawnBase::BindAttributeChangeDelegates()
+{
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	if (!ASC)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("APDPawnBase::InitAttributeSet - ASC is not valid"));
+		return;
+	}
+	
+	ASC->GetGameplayAttributeValueChangeDelegate(UPDAttributeSetBase::GetHealthAttribute()).AddUObject(this, &ThisClass::OnHealthChanged);
+}
+
+void APDPawnBase::OnHealthChanged(const FOnAttributeChangeData& Data)
+{
+	UE_LOG(LogTemp, Warning, TEXT("APDPawnBase::OnHealthChanged - New Health: %f"), Data.NewValue);
+}
+
+void APDPawnBase::OnMoveSpeedChanged(const FOnAttributeChangeData& Data)
+{
+	UE_LOG(LogTemp, Warning, TEXT("APDPawnBase::OnMoveSpeedChanged - New Move Speed: %f"), Data.NewValue);
+}
+
 void APDPawnBase::Input_AbilityInputPressed(FGameplayTag InputTag)
 {
 	if (UPDAbilitySystemComponent* ASC = Cast<UPDAbilitySystemComponent>(GetAbilitySystemComponent()))
@@ -127,4 +168,3 @@ void APDPawnBase::Input_AbilityInputReleased(FGameplayTag InputTag)
 		ASC->OnAbilityInputReleased(InputTag);
 	}
 }
-

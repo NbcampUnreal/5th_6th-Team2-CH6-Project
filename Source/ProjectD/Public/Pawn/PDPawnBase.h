@@ -12,6 +12,7 @@ class UDataAsset_InputConfig;
 class UDataAsset_StartUpBase;
 class USkeletalMeshComponent;
 struct FInputActionValue;
+struct FOnAttributeChangeData;
 
 UCLASS()
 class PROJECTD_API APDPawnBase : public APawn, public IAbilitySystemInterface
@@ -38,8 +39,13 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void InitAbilityActorInfo();
+	void InitAttributeSet();
+	void BindAttributeChangeDelegates();
 
 private:
+	void OnHealthChanged(const FOnAttributeChangeData& Data);
+	void OnMoveSpeedChanged(const FOnAttributeChangeData& Data);
+	
 	void Input_AbilityInputPressed(FGameplayTag InputTag);
 	void Input_AbilityInputReleased(FGameplayTag InputTag);
 
