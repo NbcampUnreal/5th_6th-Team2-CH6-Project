@@ -29,4 +29,6 @@ namespace PDGameplayTags
 	
 	/** SetByCaller Tags **/
 	PROJECTD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Weapon_Damage);
+	PROJECTD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Weapon_FireInterval);
+	PROJECTD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Weapon_Fire);
 }

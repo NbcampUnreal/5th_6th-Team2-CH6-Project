@@ -15,7 +15,7 @@
 
 APDPawnBase::APDPawnBase()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
 	WeaponManageComponent = CreateDefaultSubobject<UWeaponManageComponent>(TEXT("WeaponManageComponent"));
@@ -50,6 +50,16 @@ void APDPawnBase::ClientDrawFireDebug_Implementation(
 	if (bHit)
 	{
 		DrawDebugPoint(GetWorld(), HitPoint, 8.f, FColor::Yellow, false, 1.f);
+	}
+}
+
+void APDPawnBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+	if (UPDAbilitySystemComponent* ASC = Cast<UPDAbilitySystemComponent>(GetAbilitySystemComponent()))
+	{
+		ASC->ProcessAbilityInput(DeltaTime);
 	}
 }
 

@@ -7,9 +7,10 @@
 class UPDAbilitySystemComponent;
 
 UENUM(BlueprintType)
-enum class EPTAbilityActivationPolicy : uint8
+enum class EPDAbilityActivationPolicy : uint8
 {
-	OnTriggered,
+	OnInputTriggered,
+	WhileInputActive,
 	OnGiven
 };
 
@@ -35,7 +36,7 @@ protected:
 	UFUNCTION(BlueprintPure, Category = "ASC")
 	UPDAbilitySystemComponent* GetPDAbilitySystemComponentFromActorInfo() const;
 	
-protected:
-	UPROPERTY(EditDefaultsOnly, Category = "MA|Ability")
-	EPTAbilityActivationPolicy AbilityActivationPolicy = EPTAbilityActivationPolicy::OnTriggered;
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "PD|Ability")
+	EPDAbilityActivationPolicy ActivationPolicy = EPDAbilityActivationPolicy::OnInputTriggered;
 };

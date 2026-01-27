@@ -12,4 +12,13 @@ class PROJECTD_API UPDAbilitySystemComponent : public UAbilitySystemComponent
 public:
 	void OnAbilityInputPressed(const FGameplayTag& InInputTag);
 	void OnAbilityInputReleased(const FGameplayTag& InInputTag);
+	
+	void ProcessAbilityInput(float DeltaTime);
+
+private:
+	TSet<FGameplayTag> HoldInputTags;
+	TMap<FGameplayTag, float> NextTryTimeByTag;
+
+	void TryActivateByInputTag(const FGameplayTag& InputTag);
+	float GetFireIntervalFromEquippedWeapon() const;
 };

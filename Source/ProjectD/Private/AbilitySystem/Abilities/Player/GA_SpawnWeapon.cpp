@@ -5,7 +5,7 @@
 
 UGA_SpawnWeapon::UGA_SpawnWeapon()
 {
-	AbilityActivationPolicy = EPTAbilityActivationPolicy::OnGiven;
+	ActivationPolicy = EPDAbilityActivationPolicy::OnGiven;
 }
 
 void UGA_SpawnWeapon::ActivateAbility(const FGameplayAbilitySpecHandle Handle,

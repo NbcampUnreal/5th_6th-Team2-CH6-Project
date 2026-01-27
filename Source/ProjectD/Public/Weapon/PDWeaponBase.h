@@ -13,8 +13,12 @@ class PROJECTD_API APDWeaponBase : public AActor
 	
 public:	
 	APDWeaponBase();
+	
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	FVector GetMuzzlePoint() const;
+	
+	bool ServerCanFire(float Interval);
 	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

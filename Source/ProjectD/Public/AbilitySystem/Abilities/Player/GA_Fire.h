@@ -26,9 +26,10 @@ public:
 	) override;
 	
 protected:
-	void ApplyWeaponDamageGE(const FHitResult& Hit, const APDWeaponBase* Weapon);
-	
 	void OnTargetDataReceived(const FGameplayAbilityTargetDataHandle& Data, FGameplayTag ActivationTag);
 	void MuzzleTraceAndApplyGE(APDPawnBase* OwnerPawn, APDWeaponBase* Weapon, const FVector& AimPoint);
-	static FGameplayAbilityTargetDataHandle MakeAimPointTargetData(const FVector& CameraStart, const FVector& AimPoint);
+	FGameplayAbilityTargetDataHandle MakeAimPointTargetData(const FVector& CameraStart, const FVector& AimPoint);
+	
+	void ApplyWeaponDamageGE(const FHitResult& Hit, const APDWeaponBase* Weapon);
+	void ApplyFireCooldownToOwner(const APDWeaponBase* Weapon);
 };
