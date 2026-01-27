@@ -26,4 +26,7 @@ namespace PDGameplayTags
 	/** Event Tags **/
 	PROJECTD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Weapon_EquipRequest);
 	PROJECTD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Weapon_EquipConfirm);
+	
+	/** SetByCaller Tags **/
+	PROJECTD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Data_Weapon_Damage);
 }

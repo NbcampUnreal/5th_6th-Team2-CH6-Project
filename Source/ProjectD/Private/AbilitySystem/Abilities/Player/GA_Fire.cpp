@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "DataAssets/Weapon/DataAsset_Weapon.h"
+#include "PDGameplayTags.h"
 
 UGA_Fire::UGA_Fire()
 {
@@ -90,7 +91,7 @@ void UGA_Fire::ActivateAbility(
 			CameraHit,
 			CameraStart,
 			CameraEnd,
-			ECC_Visibility,
+			ECC_GameTraceChannel1,
 			Params
 		);
 
@@ -114,6 +115,47 @@ void UGA_Fire::ActivateAbility(
 	}
 
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+}
+
+void UGA_Fire::ApplyWeaponDamageGE(const FHitResult& Hit, const APDWeaponBase* Weapon)
+{
+	if (!Weapon || !Weapon->WeaponData || !Weapon->WeaponData->WeaponDamageGE)
+	{
+		return;
+	}
+	
+	AActor* TargetActor = Hit.GetActor();
+	if (!IsValid(TargetActor))
+	{
+		return;
+	}
+
+	UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo();
+	if (!SourceASC)
+	{
+		return;
+	}
+
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	if (!TargetASC)
+	{
+		return;
+	}
+
+	const float Damage = Weapon->WeaponData->WeaponDamage;
+	const int32 Level = GetAbilityLevel();
+
+	FGameplayEffectContextHandle Context = SourceASC->MakeEffectContext();
+	Context.AddHitResult(Hit);
+
+	FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(Weapon->WeaponData->WeaponDamageGE, Level, Context);
+	if (!SpecHandle.IsValid())
+	{
+		return;
+	}
+
+	SpecHandle.Data->SetSetByCallerMagnitude(PDGameplayTags::Data_Weapon_Damage, Damage);
+	SourceASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
 }
 
 void UGA_Fire::OnTargetDataReceived(const FGameplayAbilityTargetDataHandle& Data, FGameplayTag ActivationTag)
@@ -180,13 +222,13 @@ void UGA_Fire::MuzzleTraceAndApplyGE(APDPawnBase* OwnerPawn, APDWeaponBase* Weap
 		Hit,
 		MuzzleStart,
 		MuzzleEnd,
-		ECC_Visibility,
+		ECC_GameTraceChannel1,
 		Params
 	);
 
-	OwnerPawn->ClientDrawFireDebug(MuzzleStart, bHit? Hit.ImpactPoint : MuzzleEnd, bHit, Hit.ImpactPoint);
+	ApplyWeaponDamageGE(Hit, Weapon);
 	
-	// TODO: Apply Gameplay Effect to Hit Target
+	OwnerPawn->ClientDrawFireDebug(MuzzleStart, bHit? Hit.ImpactPoint : MuzzleEnd, bHit, Hit.ImpactPoint);
 }
 
 FGameplayAbilityTargetDataHandle UGA_Fire::MakeAimPointTargetData(const FVector& CameraStart, const FVector& AimPoint)
