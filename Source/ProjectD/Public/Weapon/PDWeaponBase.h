@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Weapon/PDWeaponTypes.h"
 #include "PDWeaponBase.generated.h"
 
 class UDataAsset_Weapon;
@@ -13,12 +14,17 @@ class PROJECTD_API APDWeaponBase : public AActor
 	
 public:	
 	APDWeaponBase();
+
+	FORCEINLINE EPDWeaponFireMode GetCurrentFireMode() const { return CurrentFireMode; }
+	FORCEINLINE bool IsFullAuto() const { return CurrentFireMode == EPDWeaponFireMode::FullAuto; }
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	FVector GetMuzzlePoint() const;
 	
 	bool ServerCanFire(float Interval);
+	
+	void InitFireMode();
 	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -30,4 +36,8 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USceneComponent> Muzzle;
+	
+private:
+	UPROPERTY(Replicated)
+	EPDWeaponFireMode CurrentFireMode = EPDWeaponFireMode::SemiAuto;
 };

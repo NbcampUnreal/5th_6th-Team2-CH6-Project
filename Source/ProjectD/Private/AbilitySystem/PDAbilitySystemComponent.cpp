@@ -16,8 +16,14 @@ void UPDAbilitySystemComponent::OnAbilityInputPressed(const FGameplayTag& InInpu
 	
 	TryActivateByInputTag(InInputTag);
 	
-	HoldInputTags.Add(InInputTag);
-	NextTryTimeByTag.FindOrAdd(InInputTag, 0.f);
+	if (InInputTag.MatchesTagExact(PDGameplayTags::InputTag_Weapon_Fire))
+	{
+		if (IsEquippedWeaponFullAuto(this))
+		{
+			HoldInputTags.Add(InInputTag);
+			NextTryTimeByTag.FindOrAdd(InInputTag, 0.f);
+		}
+	}
 }
 
 void UPDAbilitySystemComponent::OnAbilityInputReleased(const FGameplayTag& InInputTag)
@@ -59,30 +65,6 @@ void UPDAbilitySystemComponent::TryActivateByInputTag(const FGameplayTag& InputT
 	}
 }
 
-float UPDAbilitySystemComponent::GetFireIntervalFromEquippedWeapon() const
-{
-	const FGameplayAbilityActorInfo* ActorInfo = AbilityActorInfo.Get();
-	if (!ActorInfo || !ActorInfo->AvatarActor.IsValid())
-	{
-		return 0.1f;
-	}
-
-	const APDPawnBase* Pawn = Cast<APDPawnBase>(ActorInfo->AvatarActor.Get());
-	if (!Pawn)
-	{
-		return 0.1f;
-	}
-
-	const UWeaponManageComponent* WMC = Pawn->FindComponentByClass<UWeaponManageComponent>();
-	const APDWeaponBase* Weapon = WMC ? WMC->GetEquippedWeapon() : nullptr;
-	if (!Weapon || !Weapon->WeaponData)
-	{
-		return 0.1f;
-	}
-
-	return Weapon->WeaponData->FireInterval;
-}
-
 void UPDAbilitySystemComponent::ProcessAbilityInput(float DeltaTime)
 {
 	UWorld* World = GetWorld();
@@ -92,11 +74,18 @@ void UPDAbilitySystemComponent::ProcessAbilityInput(float DeltaTime)
 	{
 		return;
 	}
+	
+	if (!IsEquippedWeaponFullAuto(this))
+	{
+		HoldInputTags.Remove(PDGameplayTags::InputTag_Weapon_Fire);
+		NextTryTimeByTag.Remove(PDGameplayTags::InputTag_Weapon_Fire);
+		return;
+	}
 
 	const float Now = World->GetTimeSeconds();
 	float& NextTry = NextTryTimeByTag.FindOrAdd(PDGameplayTags::InputTag_Weapon_Fire, 0.f);
 
-	constexpr float PollInterval = 0.02f;
+	constexpr float PollInterval = 0.02f; // 50 times per second
 	if (Now < NextTry)
 	{
 		return;
@@ -105,4 +94,34 @@ void UPDAbilitySystemComponent::ProcessAbilityInput(float DeltaTime)
 	NextTry = Now + PollInterval;
 
 	TryActivateByInputTag(PDGameplayTags::InputTag_Weapon_Fire);
+}
+
+APDWeaponBase* UPDAbilitySystemComponent::GetEquippedWeaponFromASC(const UAbilitySystemComponent* ASC) const
+{
+	if (!ASC)
+	{
+		return nullptr;
+	}
+	
+	const FGameplayAbilityActorInfo* ActorInfo = ASC->AbilityActorInfo.Get();
+	if (!ActorInfo || !ActorInfo->AvatarActor.IsValid())
+	{
+		return nullptr;
+	}
+
+	const APDPawnBase* Pawn = Cast<APDPawnBase>(ActorInfo->AvatarActor.Get());
+	if (!Pawn)
+	{
+		return nullptr;
+	}
+	
+	const UWeaponManageComponent* WMC = Pawn->FindComponentByClass<UWeaponManageComponent>();
+	
+	return WMC ? WMC->GetEquippedWeapon() : nullptr;
+}
+
+bool UPDAbilitySystemComponent::IsEquippedWeaponFullAuto(const UAbilitySystemComponent* ASC) const
+{
+	const APDWeaponBase* Weapon = GetEquippedWeaponFromASC(ASC);
+	return (Weapon && Weapon->IsFullAuto());
 }

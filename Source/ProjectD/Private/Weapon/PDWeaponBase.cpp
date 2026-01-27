@@ -1,4 +1,5 @@
 #include "Weapon/PDWeaponBase.h"
+#include "DataAssets/Weapon/DataAsset_Weapon.h"
 #include "Net/UnrealNetwork.h"
 
 APDWeaponBase::APDWeaponBase()
@@ -32,5 +33,15 @@ bool APDWeaponBase::ServerCanFire(float Interval)
 		return false;
 	}
 	
+	// check remaining bullet and other conditions here if needed
+	
 	return true;
+}
+
+void APDWeaponBase::InitFireMode()
+{
+	if (WeaponData)
+	{
+		CurrentFireMode = WeaponData->DefaultFireMode;
+	}
 }

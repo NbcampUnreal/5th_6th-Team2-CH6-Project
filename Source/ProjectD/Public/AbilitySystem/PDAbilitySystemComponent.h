@@ -4,6 +4,9 @@
 #include "AbilitySystemComponent.h"
 #include "PDAbilitySystemComponent.generated.h"
 
+class APDWeaponBase;
+class UAbilitySystemComponent;
+
 UCLASS()
 class PROJECTD_API UPDAbilitySystemComponent : public UAbilitySystemComponent
 {
@@ -16,9 +19,12 @@ public:
 	void ProcessAbilityInput(float DeltaTime);
 
 private:
+	void TryActivateByInputTag(const FGameplayTag& InputTag);
+	
+	APDWeaponBase* GetEquippedWeaponFromASC(const UAbilitySystemComponent* ASC) const;
+	bool IsEquippedWeaponFullAuto(const UAbilitySystemComponent* ASC) const;
+	
+private:
 	TSet<FGameplayTag> HoldInputTags;
 	TMap<FGameplayTag, float> NextTryTimeByTag;
-
-	void TryActivateByInputTag(const FGameplayTag& InputTag);
-	float GetFireIntervalFromEquippedWeapon() const;
 };
