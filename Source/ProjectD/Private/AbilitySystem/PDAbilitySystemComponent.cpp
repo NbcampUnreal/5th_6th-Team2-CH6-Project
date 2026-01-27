@@ -7,14 +7,22 @@ void UPDAbilitySystemComponent::OnAbilityInputPressed(const FGameplayTag& InInpu
 		return;
 	}
 
-	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	TArray<FGameplayAbilitySpecHandle> HandlesToActivate;
 	{
-		if (!AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InInputTag))
-		{
-			continue;
-		}
+		FScopedAbilityListLock AbilityListLock(*this);
 
-		TryActivateAbility(AbilitySpec.Handle);
+		for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+		{
+			if (AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InInputTag))
+			{
+				HandlesToActivate.Add(AbilitySpec.Handle);
+			}
+		}
+	}
+
+	for (const FGameplayAbilitySpecHandle& Handle : HandlesToActivate)
+	{
+		TryActivateAbility(Handle);
 	}
 }
 
