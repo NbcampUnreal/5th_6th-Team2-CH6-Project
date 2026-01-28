@@ -19,12 +19,11 @@ public:
 
 	virtual void OnInteract_Implementation(AActor* Interactor) override;
 
-	bool CanPlaceBall(APawn* Pawn, ABallCore* Ball) const;
-
-	void Server_PlaceBall(APawn* Pawn, ABallCore* Ball);
-	void Server_StealBall(APawn* Stealer);
-
 protected:
+	bool CanPlaceBall(APawn* Pawn, ABallCore* Ball) const;
+	void PlaceBall(APawn* Pawn, ABallCore* Ball);
+	void StealBall(APawn* Stealer);
+	
 	void StartHoldTimer();
 	void OnHoldComplete();
 

@@ -35,7 +35,10 @@ void ABallCore::OnInteract_Implementation(AActor* Interactor)
 
 void ABallCore::Server_SetCarrier(APawn* NewCarrier)
 {
-	if (!HasAuthority()) return;
+	if (!HasAuthority()) 
+	{
+		return;
+	}
 
 	CarrierPawn = NewCarrier;
 	HandleCarrierChanged();
@@ -43,14 +46,20 @@ void ABallCore::Server_SetCarrier(APawn* NewCarrier)
 
 void ABallCore::Server_ClearCarrier()
 {
-	if (!HasAuthority()) return;
+	if (!HasAuthority())
+	{
+		return;
+	}
 
 	Server_SetCarrier(nullptr);
 }
 
 void ABallCore::Server_DropPhysics(const FVector& DropLocation, const FVector& Impulse)
 {
-	if (!HasAuthority()) return;
+	if (!HasAuthority()) 
+	{
+		return;
+	}
 
 	CarrierPawn = nullptr;
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);

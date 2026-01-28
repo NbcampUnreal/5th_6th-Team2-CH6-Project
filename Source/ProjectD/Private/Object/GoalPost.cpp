@@ -15,15 +15,18 @@ AGoalPost::AGoalPost()
 void AGoalPost::OnInteract_Implementation(AActor* Interactor)
 {
 	APDPawnBase* PDPawn = Cast<APDPawnBase>(Interactor);
-	if (!PDPawn) return;
+	if (!PDPawn)
+	{
+		return;
+	}
 
 	if (PDPawn->GetCarriedBall())
 	{
-		Server_PlaceBall(PDPawn, PDPawn->GetCarriedBall());
+		PlaceBall(PDPawn, PDPawn->GetCarriedBall());
 	}
 	else if (PlacedBall)
 	{
-		Server_StealBall(PDPawn);
+		StealBall(PDPawn);
 	}
 }
 
@@ -32,10 +35,16 @@ bool AGoalPost::CanPlaceBall(APawn* Pawn, ABallCore* Ball) const
 	return Pawn && Ball && !PlacedBall;
 }
 
-void AGoalPost::Server_PlaceBall(APawn* Pawn, ABallCore* Ball)
+void AGoalPost::PlaceBall(APawn* Pawn, ABallCore* Ball)
 {
-	if (!HasAuthority()) return;
-	if (!CanPlaceBall(Pawn, Ball)) return;
+	if (!HasAuthority())
+	{
+		return;
+	}
+	if (!CanPlaceBall(Pawn, Ball)) 
+	{
+		return;
+	}
 
 	PlacedBall = Ball;
 
@@ -50,9 +59,12 @@ void AGoalPost::Server_PlaceBall(APawn* Pawn, ABallCore* Ball)
 	StartHoldTimer();
 }
 
-void AGoalPost::Server_StealBall(APawn* Stealer)
+void AGoalPost::StealBall(APawn* Stealer)
 {
-	if (!HasAuthority()) return;
+	if (!HasAuthority()) 
+	{
+		return;
+	}
 
 	GetWorld()->GetTimerManager().ClearTimer(HoldTimer);
 
@@ -68,9 +80,7 @@ void AGoalPost::Server_StealBall(APawn* Stealer)
 
 void AGoalPost::StartHoldTimer()
 {
-	GetWorld()->GetTimerManager().SetTimer(
-		HoldTimer, this, &AGoalPost::OnHoldComplete, 10.f, false
-	);
+	GetWorld()->GetTimerManager().SetTimer(HoldTimer, this, &AGoalPost::OnHoldComplete, 10.f, false);
 }
 
 void AGoalPost::OnHoldComplete()

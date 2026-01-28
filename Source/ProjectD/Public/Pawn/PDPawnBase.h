@@ -66,8 +66,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CharacterData")
 	TSoftObjectPtr<UDataAsset_StartUpBase> CharacterStartUpData;
 
-
-// =============
+#pragma region Ball
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out) const override;
 
@@ -89,7 +88,6 @@ public:
 	FName BallSocketName = FName("BallSocket");
 
 protected:
-	// ===== 상태 =====
 	UPROPERTY(Replicated)
 	TObjectPtr<ABallCore> CarriedBall = nullptr; 
 
@@ -102,4 +100,6 @@ protected:
 	void Server_TryInteract(AActor* Target);
 
 	AActor* FindInteractTarget() const;
+
+#pragma endregion Ball
 };
