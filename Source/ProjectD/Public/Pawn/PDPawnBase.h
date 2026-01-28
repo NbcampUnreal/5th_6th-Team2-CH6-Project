@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
@@ -11,6 +11,10 @@ class USkillManageComponent;
 class UDataAsset_InputConfig;
 class UDataAsset_StartUpBase;
 class USkeletalMeshComponent;
+class ABallCore;
+class AGoalPost;
+class UGameplayEffect;
+class UCapsuleComponent;
 struct FInputActionValue;
 struct FOnAttributeChangeData;
 
@@ -61,4 +65,41 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CharacterData")
 	TSoftObjectPtr<UDataAsset_StartUpBase> CharacterStartUpData;
+
+#pragma region Ball
+public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out) const override;
+
+	// 입력(F)
+	UFUNCTION(BlueprintCallable)
+	void TryInteract();
+
+	UFUNCTION(Server, Reliable)
+	void Server_PickUpBall(ABallCore* Ball);
+
+	UFUNCTION(Server, Reliable)
+	void Server_DropBall();
+
+	void Server_ForceClearCarriedBall();
+
+	ABallCore* GetCarriedBall() const { return CarriedBall; }
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+	FName BallSocketName = FName("BallSocket");
+
+protected:
+	UPROPERTY(Replicated)
+	TObjectPtr<ABallCore> CarriedBall = nullptr; 
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGameplayEffect> GE_HoldingBall;
+	void ApplyHoldingBallEffect(); 
+	void RemoveHoldingBallEffect(); 
+
+	UFUNCTION(Server, Reliable)
+	void Server_TryInteract(AActor* Target);
+
+	AActor* FindInteractTarget() const;
+
+#pragma endregion Ball
 };
