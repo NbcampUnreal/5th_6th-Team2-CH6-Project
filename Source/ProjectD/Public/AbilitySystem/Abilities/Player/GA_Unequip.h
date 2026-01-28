@@ -10,6 +10,8 @@ class PROJECTD_API UGA_Unequip : public UPDPlayerGameplayAbility
 	GENERATED_BODY()
 	
 public:
+	UGA_Unequip();
+	
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,

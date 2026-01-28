@@ -12,6 +12,7 @@ UGA_Fire::UGA_Fire()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
+	NetSecurityPolicy = EGameplayAbilityNetSecurityPolicy::ClientOrServer;
 	ActivationPolicy = EPDAbilityActivationPolicy::WhileInputActive;
 }
 
@@ -114,10 +115,7 @@ void UGA_Fire::ActivateAbility(
 		DrawDebugLine(World, CameraStart, AimPoint, FColor::Cyan, false, 1.f, 0, 1.f);
 		
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
-		return;
 	}
-
-	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 }
 
 void UGA_Fire::OnTargetDataReceived(const FGameplayAbilityTargetDataHandle& Data, FGameplayTag ActivationTag)

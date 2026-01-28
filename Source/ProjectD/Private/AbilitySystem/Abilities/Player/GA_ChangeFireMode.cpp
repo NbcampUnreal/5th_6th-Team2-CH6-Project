@@ -1,15 +1,16 @@
-#include "AbilitySystem/Abilities/Player/GA_Equip.h"
+#include "AbilitySystem/Abilities/Player/GA_ChangeFireMode.h"
 #include "Components/Combat/WeaponManageComponent.h"
+#include "Pawn/PDPawnBase.h"
+#include "Weapon/PDWeaponBase.h"
 
-UGA_Equip::UGA_Equip()
+UGA_ChangeFireMode::UGA_ChangeFireMode()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 	NetSecurityPolicy = EGameplayAbilityNetSecurityPolicy::ClientOrServer;
 }
 
-void UGA_Equip::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle,
+void UGA_ChangeFireMode::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
@@ -21,23 +22,25 @@ void UGA_Equip::ActivateAbility(
 		return;
 	}
 	
-	UWeaponManageComponent* WMC = GetWeaponManageComponentFromActorInfo();
-	if (!WMC)
+	APDPawnBase* OwnerPawn = ActorInfo ? Cast<APDPawnBase>(ActorInfo->AvatarActor.Get()) : nullptr;
+	if (!OwnerPawn)
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
-	
-	if (!WMC->GetWeaponInSlot(EquipSlotIndex))
+
+	UWeaponManageComponent* WMC = OwnerPawn->FindComponentByClass<UWeaponManageComponent>();
+	APDWeaponBase* Weapon = WMC ? WMC->GetEquippedWeapon() : nullptr;
+	if (!Weapon || !Weapon->WeaponData)
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
-	
+
 	if (HasAuthority(&ActivationInfo))
 	{
-		WMC->EquipSlot(EquipSlotIndex);
+		Weapon->ChangeFireMode();
 	}
-	
+
 	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 }

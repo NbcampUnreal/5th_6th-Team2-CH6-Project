@@ -20,6 +20,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EPDWeaponFireMode DefaultFireMode = EPDWeaponFireMode::SemiAuto;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<EPDWeaponFireMode> SupportedFireModes = { EPDWeaponFireMode::SemiAuto };
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (TitleProperty = "InputTag"))
 	TArray<FPDPlayerAbilitySet> GrantedAbilitySets = {};
 	

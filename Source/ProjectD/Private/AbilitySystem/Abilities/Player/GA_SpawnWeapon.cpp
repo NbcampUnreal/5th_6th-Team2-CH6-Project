@@ -5,6 +5,9 @@
 
 UGA_SpawnWeapon::UGA_SpawnWeapon()
 {
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
+	NetSecurityPolicy = EGameplayAbilityNetSecurityPolicy::ServerOnly;
 	ActivationPolicy = EPDAbilityActivationPolicy::OnGiven;
 }
 

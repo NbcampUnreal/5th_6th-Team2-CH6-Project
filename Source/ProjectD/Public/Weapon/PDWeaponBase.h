@@ -25,6 +25,10 @@ public:
 	bool ServerCanFire(float Interval);
 	
 	void InitFireMode();
+	void ChangeFireMode();
+	
+private:
+	EPDWeaponFireMode GetNextFireMode() const;
 	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

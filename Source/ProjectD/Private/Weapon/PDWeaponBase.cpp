@@ -18,6 +18,7 @@ void APDWeaponBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
+	DOREPLIFETIME(APDWeaponBase, CurrentFireMode);
 }
 
 FVector APDWeaponBase::GetMuzzlePoint() const
@@ -44,4 +45,44 @@ void APDWeaponBase::InitFireMode()
 	{
 		CurrentFireMode = WeaponData->DefaultFireMode;
 	}
+}
+
+void APDWeaponBase::ChangeFireMode()
+{
+	const TArray<EPDWeaponFireMode>& Modes = WeaponData->SupportedFireModes;
+	if (Modes.Num() <= 1)
+	{
+		return;
+	}
+	
+	CurrentFireMode = GetNextFireMode();
+}
+
+EPDWeaponFireMode APDWeaponBase::GetNextFireMode() const
+{
+	if (!WeaponData)
+	{
+		return CurrentFireMode;
+	}
+
+	const TArray<EPDWeaponFireMode>& Modes = WeaponData->SupportedFireModes;
+	if (Modes.Num() == 0)
+	{
+		return CurrentFireMode;
+	}
+
+	int32 Index = Modes.IndexOfByKey(CurrentFireMode);
+	if (Index == INDEX_NONE)
+	{
+		if (Modes.Contains(WeaponData->DefaultFireMode))
+		{
+			return WeaponData->DefaultFireMode;
+		}
+		
+		return Modes[0];
+	}
+
+	Index = (Index + 1) % Modes.Num();
+	
+	return Modes[Index];
 }
