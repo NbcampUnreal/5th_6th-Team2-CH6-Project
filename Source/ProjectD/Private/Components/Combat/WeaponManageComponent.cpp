@@ -42,6 +42,7 @@ bool UWeaponManageComponent::AddWeaponToInventory(TSubclassOf<APDWeaponBase> Wea
         return false;
     }
 
+    NewWeapon->InitFireMode();
     Slots[EmptySlotIndex].WeaponActor = NewWeapon;
     AttachToBack(NewWeapon, EmptySlotIndex);
 

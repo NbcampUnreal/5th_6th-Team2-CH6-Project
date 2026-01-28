@@ -12,6 +12,8 @@ UGA_Fire::UGA_Fire()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
+	NetSecurityPolicy = EGameplayAbilityNetSecurityPolicy::ClientOrServer;
+	ActivationPolicy = EPDAbilityActivationPolicy::WhileInputActive;
 }
 
 void UGA_Fire::ActivateAbility(
@@ -42,12 +44,14 @@ void UGA_Fire::ActivateAbility(
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
-
+	
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
+	
+	ApplyFireCooldownToOwner(Weapon);
 	
 	const FPredictionKey PredKey = ActivationInfo.GetActivationPredictionKey();
 
@@ -111,51 +115,7 @@ void UGA_Fire::ActivateAbility(
 		DrawDebugLine(World, CameraStart, AimPoint, FColor::Cyan, false, 1.f, 0, 1.f);
 		
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
-		return;
 	}
-
-	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
-}
-
-void UGA_Fire::ApplyWeaponDamageGE(const FHitResult& Hit, const APDWeaponBase* Weapon)
-{
-	if (!Weapon || !Weapon->WeaponData || !Weapon->WeaponData->WeaponDamageGE)
-	{
-		return;
-	}
-	
-	AActor* TargetActor = Hit.GetActor();
-	if (!IsValid(TargetActor))
-	{
-		return;
-	}
-
-	UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo();
-	if (!SourceASC)
-	{
-		return;
-	}
-
-	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
-	if (!TargetASC)
-	{
-		return;
-	}
-
-	const float Damage = Weapon->WeaponData->WeaponDamage;
-	const int32 Level = GetAbilityLevel();
-
-	FGameplayEffectContextHandle Context = SourceASC->MakeEffectContext();
-	Context.AddHitResult(Hit);
-
-	FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(Weapon->WeaponData->WeaponDamageGE, Level, Context);
-	if (!SpecHandle.IsValid())
-	{
-		return;
-	}
-
-	SpecHandle.Data->SetSetByCallerMagnitude(PDGameplayTags::Data_Weapon_Damage, Damage);
-	SourceASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
 }
 
 void UGA_Fire::OnTargetDataReceived(const FGameplayAbilityTargetDataHandle& Data, FGameplayTag ActivationTag)
@@ -182,6 +142,13 @@ void UGA_Fire::OnTargetDataReceived(const FGameplayAbilityTargetDataHandle& Data
         EndAbility(CurrentSpecHandle, ActorInfo, CurrentActivationInfo, true, true);
         return;
     }
+	
+	// if (!Weapon->ServerCanFire(Weapon->WeaponData->FireInterval))
+	// {
+	// 	ASC->ConsumeClientReplicatedTargetData(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey());
+	// 	EndAbility(CurrentSpecHandle, ActorInfo, CurrentActivationInfo, true, false);
+	// 	return;
+	// }
 
     ASC->ConsumeClientReplicatedTargetData(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey());
  
@@ -231,6 +198,72 @@ void UGA_Fire::MuzzleTraceAndApplyGE(APDPawnBase* OwnerPawn, APDWeaponBase* Weap
 	OwnerPawn->ClientDrawFireDebug(MuzzleStart, bHit? Hit.ImpactPoint : MuzzleEnd, bHit, Hit.ImpactPoint);
 }
 
+void UGA_Fire::ApplyWeaponDamageGE(const FHitResult& Hit, const APDWeaponBase* Weapon)
+{
+	if (!Weapon || !Weapon->WeaponData || !Weapon->WeaponData->WeaponDamageGE)
+	{
+		return;
+	}
+	
+	AActor* TargetActor = Hit.GetActor();
+	if (!IsValid(TargetActor))
+	{
+		return;
+	}
+
+	UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo();
+	if (!SourceASC)
+	{
+		return;
+	}
+
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	if (!TargetASC)
+	{
+		return;
+	}
+
+	const float Damage = Weapon->WeaponData->WeaponDamage;
+	const int32 Level = GetAbilityLevel();
+
+	FGameplayEffectContextHandle Context = SourceASC->MakeEffectContext();
+	Context.AddHitResult(Hit);
+
+	FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(Weapon->WeaponData->WeaponDamageGE, Level, Context);
+	if (!SpecHandle.IsValid())
+	{
+		return;
+	}
+
+	SpecHandle.Data->SetSetByCallerMagnitude(PDGameplayTags::Data_Weapon_Damage, Damage);
+	SourceASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+}
+
+void UGA_Fire::ApplyFireCooldownToOwner(const APDWeaponBase* Weapon)
+{
+	if (!Weapon || !Weapon->WeaponData || !Weapon->WeaponData->FireCooldownGE)
+	{
+		return;
+	}
+
+	const float Interval = FMath::Max(0.01f, Weapon->WeaponData->FireInterval);
+
+	FGameplayEffectSpecHandle CooldownEffect = MakeOutgoingGameplayEffectSpec(Weapon->WeaponData->FireCooldownGE, GetAbilityLevel());
+	if (!CooldownEffect.IsValid())
+	{
+		return;
+	}
+
+	CooldownEffect.Data->SetSetByCallerMagnitude(PDGameplayTags::Data_Weapon_FireInterval, Interval);
+
+	ApplyGameplayEffectSpecToOwner(
+		GetCurrentAbilitySpecHandle(),
+		GetCurrentActorInfo(),
+		GetCurrentActivationInfo(),
+		CooldownEffect
+	);
+}
+
 FGameplayAbilityTargetDataHandle UGA_Fire::MakeAimPointTargetData(const FVector& CameraStart, const FVector& AimPoint)
 {
 	FGameplayAbilityTargetDataHandle Handle;
@@ -243,5 +276,6 @@ FGameplayAbilityTargetDataHandle UGA_Fire::MakeAimPointTargetData(const FVector&
 	Loc->TargetLocation.LiteralTransform = FTransform(AimPoint);
 
 	Handle.Add(Loc);
+	
 	return Handle;
 }

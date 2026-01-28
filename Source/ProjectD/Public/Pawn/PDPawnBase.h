@@ -37,6 +37,7 @@ public:
 	void ClientDrawFireDebug(const FVector& Start, const FVector& End, bool bHit, const FVector& HitPoint);
 	
 protected:
+	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
 	virtual void OnRep_PlayerState() override;
 	virtual void PossessedBy(AController* NewController) override;
