@@ -5,7 +5,7 @@ void UPDGameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInf
 {
 	Super::OnGiveAbility(ActorInfo, Spec);
 	
-	if (AbilityActivationPolicy == EPTAbilityActivationPolicy::OnGiven)
+	if (ActivationPolicy == EPDAbilityActivationPolicy::OnGiven)
 	{
 		if (ActorInfo && !Spec.IsActive())
 		{
@@ -24,7 +24,7 @@ void UPDGameplayAbility::EndAbility(
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	
-	if (AbilityActivationPolicy == EPTAbilityActivationPolicy::OnGiven)
+	if (ActivationPolicy == EPDAbilityActivationPolicy::OnGiven)
 	{
 		if (ActorInfo)
 		{

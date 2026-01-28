@@ -5,7 +5,10 @@
 
 UGA_SpawnWeapon::UGA_SpawnWeapon()
 {
-	AbilityActivationPolicy = EPTAbilityActivationPolicy::OnGiven;
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
+	NetSecurityPolicy = EGameplayAbilityNetSecurityPolicy::ServerOnly;
+	ActivationPolicy = EPDAbilityActivationPolicy::OnGiven;
 }
 
 void UGA_SpawnWeapon::ActivateAbility(const FGameplayAbilitySpecHandle Handle,

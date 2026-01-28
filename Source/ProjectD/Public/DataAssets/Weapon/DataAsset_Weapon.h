@@ -3,36 +3,41 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "Structs/PDPlayerAbilitySet.h"
+#include "Weapon/PDWeaponTypes.h"
 #include "DataAsset_Weapon.generated.h"
 
 class UGameplayEffect;
-
-UENUM(BlueprintType)
-enum class EPDWeaponType : uint8
-{
-	None,
-	Pistol,
-	Rifle,
-	Shotgun,
-	Throwable
-};
 
 UCLASS()
 class PROJECTD_API UDataAsset_Weapon : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
+	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	EPDWeaponType WeaponType;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (TitleProperty = "InputTag"))
-	TArray<FPDPlayerAbilitySet> GrantedAbilitySets;
+	EPDWeaponTypes WeaponType = EPDWeaponTypes::None;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<UGameplayEffect> WeaponDamageGE;
+	EPDWeaponFireMode DefaultFireMode = EPDWeaponFireMode::SemiAuto;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<EPDWeaponFireMode> SupportedFireModes = { EPDWeaponFireMode::SemiAuto };
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (TitleProperty = "InputTag"))
+	TArray<FPDPlayerAbilitySet> GrantedAbilitySets = {};
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> WeaponDamageGE = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> FireCooldownGE = nullptr;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float WeaponDamage = 30.f;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float FireInterval = 0.2f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float MaxRange = 10000.f;
 };
