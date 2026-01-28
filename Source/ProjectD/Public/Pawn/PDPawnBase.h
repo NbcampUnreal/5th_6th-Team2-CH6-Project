@@ -16,6 +16,7 @@ class AGoalPost;
 class UGameplayEffect;
 class UCapsuleComponent;
 struct FInputActionValue;
+struct FOnAttributeChangeData;
 
 UCLASS()
 class PROJECTD_API APDPawnBase : public APawn, public IAbilitySystemInterface
@@ -32,6 +33,9 @@ public:
 
 	USkeletalMeshComponent* GetSkeletalMeshComponent() const;
 	
+	UFUNCTION(Client, Unreliable)
+	void ClientDrawFireDebug(const FVector& Start, const FVector& End, bool bHit, const FVector& HitPoint);
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnRep_PlayerState() override;
@@ -39,8 +43,13 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void InitAbilityActorInfo();
+	void InitAttributeSet();
+	void BindAttributeChangeDelegates();
 
 private:
+	void OnHealthChanged(const FOnAttributeChangeData& Data);
+	void OnMoveSpeedChanged(const FOnAttributeChangeData& Data);
+	
 	void Input_AbilityInputPressed(FGameplayTag InputTag);
 	void Input_AbilityInputReleased(FGameplayTag InputTag);
 

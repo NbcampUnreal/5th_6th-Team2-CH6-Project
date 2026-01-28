@@ -14,6 +14,8 @@ class PROJECTD_API APDWeaponBase : public AActor
 public:	
 	APDWeaponBase();
 
+	FVector GetMuzzlePoint() const;
+	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UDataAsset_Weapon> WeaponData;
@@ -23,5 +25,5 @@ protected:
 	TObjectPtr<USceneComponent> RootComp;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<USceneComponent> MuzzlePoint;
+	TObjectPtr<USceneComponent> Muzzle;
 };

@@ -25,4 +25,6 @@ namespace PDGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Weapon_EquipRequest, "Event.Weapon.EquipRequest");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Weapon_EquipConfirm, "Event.Weapon.EquipConfirm");
 
+	/** SetByCaller Tags **/
+	UE_DEFINE_GAMEPLAY_TAG(Data_Weapon_Damage, "Data.Weapon.Damage");
 }
