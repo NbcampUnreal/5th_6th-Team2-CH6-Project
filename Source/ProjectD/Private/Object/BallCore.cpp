@@ -16,7 +16,7 @@ ABallCore::ABallCore()
 	Mesh->SetSimulatePhysics(true);
 	Mesh->SetCollisionProfileName(TEXT("PhysicsActor"));
 
-    Mesh->BodyInstance.bUseCCD = true;
+    Mesh->BodyInstance.bUseCCD = true; // optional
 }
 
 void ABallCore::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

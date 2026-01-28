@@ -175,6 +175,15 @@ void APDPawnBase::TryInteract()
 	}
 }
 
+void APDPawnBase::Server_ForceClearCarriedBall()
+{
+	if (!HasAuthority()) return;
+
+	CarriedBall = nullptr;
+
+	RemoveHoldingBallEffect();
+}
+
 void APDPawnBase::Server_TryInteract_Implementation(AActor* Target)
 {
 	if (Target && Target->Implements<UPDInteractableObject>())
@@ -192,8 +201,6 @@ void APDPawnBase::Server_PickUpBall_Implementation(ABallCore* Ball)
 	Ball->Server_SetCarrier(this);
 
 	ApplyHoldingBallEffect();
-
-	Server_OnBallPicked(Ball);
 }
 
 void APDPawnBase::Server_DropBall_Implementation()
@@ -210,7 +217,6 @@ void APDPawnBase::Server_DropBall_Implementation()
 	CarriedBall->Server_DropPhysics(DropLoc, Impulse);
 
 	CarriedBall = nullptr;
-	Server_OnBallRemoved();
 }
 
 void APDPawnBase::ApplyHoldingBallEffect()

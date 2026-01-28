@@ -41,6 +41,11 @@ void AGoalPost::Server_PlaceBall(APawn* Pawn, ABallCore* Ball)
 
 	Ball->Server_ClearCarrier();
 
+	if (APDPawnBase* PD = Cast<APDPawnBase>(Pawn))
+	{
+		PD->Server_ForceClearCarriedBall();
+	}
+
 	Ball->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	StartHoldTimer();
 }
@@ -48,18 +53,16 @@ void AGoalPost::Server_PlaceBall(APawn* Pawn, ABallCore* Ball)
 void AGoalPost::Server_StealBall(APawn* Stealer)
 {
 	if (!HasAuthority()) return;
-	if (!PlacedBall || !Stealer) return;
 
 	GetWorld()->GetTimerManager().ClearTimer(HoldTimer);
 
-	ABallCore* Ball = PlacedBall;
-	PlacedBall = nullptr;
+	ABallCore* BallToSteal = PlacedBall;
 
-	Ball->Server_SetCarrier(Stealer);
+	PlacedBall = nullptr;
 
 	if (APDPawnBase* PD = Cast<APDPawnBase>(Stealer))
 	{
-		PD->Server_OnBallPicked(Ball);
+		PD->Server_PickUpBall(BallToSteal);
 	}
 }
 

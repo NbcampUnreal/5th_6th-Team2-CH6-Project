@@ -66,18 +66,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TryInteract();
 
-	// Ball에서 호출
-	UFUNCTION(Server, Reliable)
-	void Server_OnBallPicked(ABallCore* Ball);
-
-	UFUNCTION(Server, Reliable)
-	void Server_OnBallRemoved();
-
 	UFUNCTION(Server, Reliable)
 	void Server_PickUpBall(ABallCore* Ball);
 
 	UFUNCTION(Server, Reliable)
 	void Server_DropBall();
+
+	void Server_ForceClearCarriedBall();
 
 	ABallCore* GetCarriedBall() const { return CarriedBall; }
 
