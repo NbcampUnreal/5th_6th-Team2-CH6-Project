@@ -1,4 +1,4 @@
-#include "Pawn/PDPawnBase.h"
+﻿#include "Pawn/PDPawnBase.h"
 #include "PlayerState/PDPlayerState.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/PDAbilitySystemComponent.h"
@@ -12,6 +12,14 @@
 #include "PDGameplayTags.h"
 #include "DataAssets/StartUp/DataAsset_StartUpBase.h"
 #include "AttributeSet/PDAttributeSetBase.h"
+#include "Object/BallCore.h"
+#include "Object/GoalPost.h"
+#include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
+#include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Gimmick/PDInteractableObject.h"
+#include "DrawDebugHelpers.h"
 
 APDPawnBase::APDPawnBase()
 {
@@ -176,5 +184,127 @@ void APDPawnBase::Input_AbilityInputReleased(FGameplayTag InputTag)
 	if (UPDAbilitySystemComponent* ASC = Cast<UPDAbilitySystemComponent>(GetAbilitySystemComponent()))
 	{
 		ASC->OnAbilityInputReleased(InputTag);
+	}
+}
+
+void APDPawnBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APDPawnBase, CarriedBall);
+}
+
+AActor* APDPawnBase::FindInteractTarget() const
+{
+	UCameraComponent* Cam = FindComponentByClass<UCameraComponent>();
+	if (!Cam) 
+	{
+		return nullptr;
+	}
+
+	const FVector Start = Cam->GetComponentLocation();
+	const FVector End = Start + Cam->GetForwardVector() * 450.f;
+
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
+
+	FColor DebugColor = bHit ? FColor::Green : FColor::Red;
+
+	DrawDebugLine(GetWorld(),Start,End,DebugColor,false,2.0f,0,2.0f);
+
+	return Hit.GetActor();
+}
+
+void APDPawnBase::TryInteract()
+{
+	AActor* Target = FindInteractTarget();
+
+	bool bIsInteractable = IsValid(Target) && Target->Implements<UPDInteractableObject>();
+
+	if (bIsInteractable)
+	{
+		Server_TryInteract(Target);
+	}
+	else
+	{
+		if (CarriedBall)
+		{
+			Server_DropBall();
+		}
+	}
+}
+
+void APDPawnBase::Server_ForceClearCarriedBall()
+{
+	if (!HasAuthority()) return;
+
+	CarriedBall = nullptr;
+
+	RemoveHoldingBallEffect();
+}
+
+void APDPawnBase::Server_TryInteract_Implementation(AActor* Target)
+{
+	if (Target && Target->Implements<UPDInteractableObject>())
+	{
+		IPDInteractableObject::Execute_OnInteract(Target, this);
+	}
+}
+
+void APDPawnBase::Server_PickUpBall_Implementation(ABallCore* Ball)
+{
+	if (!Ball || Ball->CarrierPawn) 
+	{
+		return;
+	}
+
+	CarriedBall = Ball;
+
+	Ball->Server_SetCarrier(this);
+
+	ApplyHoldingBallEffect();
+}
+
+void APDPawnBase::Server_DropBall_Implementation()
+{
+	if (!CarriedBall) 
+	{
+		return;
+	}
+
+	RemoveHoldingBallEffect();
+
+	const FVector Forward = GetActorForwardVector();
+	const FVector DropLoc = GetActorLocation() + (Forward * 100.f) + FVector(0.f, 0.f, 80.f);
+
+	const FVector Impulse = (Forward * 300.f) + (FVector::UpVector * 200.f);
+
+	CarriedBall->Server_DropPhysics(DropLoc, Impulse);
+
+	CarriedBall = nullptr;
+}
+
+void APDPawnBase::ApplyHoldingBallEffect()
+{
+	UAbilitySystemComponent* ASC = APDPawnBase::GetAbilitySystemComponent();
+
+	if (ASC && GE_HoldingBall)
+	{
+		ASC->ApplyGameplayEffectToSelf(GE_HoldingBall.GetDefaultObject(), 1.f, ASC->MakeEffectContext());
+	}
+}
+
+void APDPawnBase::RemoveHoldingBallEffect()
+{
+	UAbilitySystemComponent* ASC = APDPawnBase::GetAbilitySystemComponent();
+
+	if (ASC)
+	{
+		FGameplayTagContainer TagContainer;
+		TagContainer.AddTag(FGameplayTag::RequestGameplayTag(TEXT("State.HoldingBall")));
+		ASC->RemoveActiveEffectsWithGrantedTags(TagContainer);
 	}
 }
