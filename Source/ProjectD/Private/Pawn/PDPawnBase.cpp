@@ -20,6 +20,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Gimmick/PDInteractableObject.h"
 #include "DrawDebugHelpers.h"
+#include "Components/PrimitiveComponent.h" // 파일 상단에 추가
+#include "GameFramework/PawnMovementComponent.h"
 
 APDPawnBase::APDPawnBase()
 {
@@ -126,6 +128,16 @@ void APDPawnBase::InitAbilityActorInfo()
 	}
 
 	PDPlayerState->InitAbilityActorInfo(this);
+
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+
+	if (ASC)
+	{
+		FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName("State.Dead"));
+		FDelegateHandle TagEventHandle = ASC->RegisterGameplayTagEvent(Tag, EGameplayTagEventType::NewOrRemoved)
+			.AddUObject(this, &ThisClass::OnDeathTagChanged);
+	}
+	
 }
 
 void APDPawnBase::InitAttributeSet()
@@ -216,6 +228,31 @@ AActor* APDPawnBase::FindInteractTarget() const
 	DrawDebugLine(GetWorld(),Start,End,DebugColor,false,2.0f,0,2.0f);
 
 	return Hit.GetActor();
+}
+
+void APDPawnBase::OnDeathTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	const bool bIsDead = NewCount > 0;
+	HandleDeathState(bIsDead);
+}
+
+void APDPawnBase::HandleDeathState(bool bIsDead)
+{
+	if (RootComponent)
+	{
+		if (UPrimitiveComponent* Primitive = Cast<UPrimitiveComponent>(RootComponent))
+		{
+			Primitive->SetCollisionEnabled(bIsDead ? ECollisionEnabled::QueryOnly : ECollisionEnabled::QueryAndPhysics);
+		}
+	}
+
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		if (bIsDead)
+			DisableInput(PC);
+		else
+			EnableInput(PC);
+	}
 }
 
 void APDPawnBase::TryInteract()

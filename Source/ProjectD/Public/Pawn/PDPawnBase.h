@@ -103,4 +103,13 @@ protected:
 	AActor* FindInteractTarget() const;
 
 #pragma endregion Ball
+
+#pragma region Respawn
+
+protected:
+	virtual void OnDeathTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+
+	virtual void HandleDeathState(bool bIsDead);
+
+#pragma endregion Respawn
 };
